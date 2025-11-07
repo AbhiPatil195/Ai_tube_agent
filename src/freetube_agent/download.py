@@ -6,6 +6,7 @@ from typing import Optional, Callable, Dict, Any
 from pytube import YouTube
 
 from .paths import VIDEOS
+from .logger import logger, error_tracker, retry
 
 
 def normalize_yt_url(url: str) -> str:
@@ -35,22 +36,28 @@ def normalize_yt_url(url: str) -> str:
 
 
 def _download_with_pytube(url: str, out_dir: Path, progress: Optional[Callable[[Dict[str, Any]], None]] = None) -> Path | None:
-    yt = YouTube(url)
-    # Prefer progressive mp4 streams which contain both audio+video
-    stream = (
-        yt.streams.filter(progressive=True, file_extension="mp4")
-        .order_by("resolution")
-        .desc()
-        .first()
-    )
-    if stream is None:
+    logger.info(f"Attempting download with pytube: {url}")
+    try:
+        yt = YouTube(url)
+        # Prefer progressive mp4 streams which contain both audio+video
         stream = (
-            yt.streams.filter(file_extension="mp4")
-            .order_by("filesize")
+            yt.streams.filter(progressive=True, file_extension="mp4")
+            .order_by("resolution")
             .desc()
             .first()
         )
-    if stream is None:
+        if stream is None:
+            stream = (
+                yt.streams.filter(file_extension="mp4")
+                .order_by("filesize")
+                .desc()
+                .first()
+            )
+        if stream is None:
+            logger.warning("No suitable stream found with pytube")
+            return None
+    except Exception as e:
+        logger.warning(f"Pytube failed: {e}")
         return None
     if progress is not None:
         total = stream.filesize or 0
@@ -72,8 +79,14 @@ def _download_with_pytube(url: str, out_dir: Path, progress: Optional[Callable[[
 
         yt.register_on_progress_callback(on_prog)
 
-    target = stream.download(output_path=str(out_dir))
-    return Path(target)
+    try:
+        target = stream.download(output_path=str(out_dir))
+        logger.info(f"Pytube download successful: {target}")
+        return Path(target)
+    except Exception as e:
+        logger.error(f"Pytube download failed: {e}")
+        error_tracker.log_error(e, context="Pytube download", module="download", function="_download_with_pytube")
+        return None
 
 
 def _get_ffmpeg_exe() -> Optional[str]:
@@ -88,9 +101,11 @@ def _get_ffmpeg_exe() -> Optional[str]:
         return None
 
 
+@retry(max_attempts=2, delay=2.0, exceptions=(RuntimeError, ConnectionError))
 def _download_with_ytdlp(url: str, out_dir: Path, progress: Optional[Callable[[Dict[str, Any]], None]] = None) -> Path:
     from yt_dlp import YoutubeDL
 
+    logger.info(f"Downloading with yt-dlp: {url}")
     out_dir.mkdir(parents=True, exist_ok=True)
 
     ffmpeg_exe = _get_ffmpeg_exe()
@@ -137,39 +152,57 @@ def _download_with_ytdlp(url: str, out_dir: Path, progress: Optional[Callable[[D
                 pass
         ydl_opts["progress_hooks"] = [hook]
 
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=True)
-        # Try to determine the final downloaded file path robustly
-        path_str = None
-        rd = info.get("requested_downloads") if isinstance(info, dict) else None
-        if rd and isinstance(rd, list) and rd and isinstance(rd[0], dict):
-            path_str = rd[0].get("filepath") or rd[0].get("_filename")
-        if not path_str:
-            path_str = info.get("filepath") or info.get("_filename")
-        if not path_str:
-            path_str = ydl.prepare_filename(info)
-        return Path(path_str)
+    try:
+        with YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=True)
+            # Try to determine the final downloaded file path robustly
+            path_str = None
+            rd = info.get("requested_downloads") if isinstance(info, dict) else None
+            if rd and isinstance(rd, list) and rd and isinstance(rd[0], dict):
+                path_str = rd[0].get("filepath") or rd[0].get("_filename")
+            if not path_str:
+                path_str = info.get("filepath") or info.get("_filename")
+            if not path_str:
+                path_str = ydl.prepare_filename(info)
+            
+            result_path = Path(path_str)
+            logger.info(f"yt-dlp download successful: {result_path}")
+            return result_path
+    except Exception as e:
+        logger.error(f"yt-dlp download failed: {e}")
+        error_tracker.log_error(e, context="yt-dlp download", module="download", function="_download_with_ytdlp")
+        raise
 
 
+@retry(max_attempts=2, delay=2.0, exceptions=(RuntimeError, ConnectionError))
 def download_youtube(url: str, output_dir: Path | None = None, progress: Optional[Callable[[Dict[str, Any]], None]] = None) -> Path:
     """
     Download a YouTube video as MP4 and return the file path.
     Tries pytube first; on failure falls back to yt-dlp (more robust).
     """
+    logger.info(f"Starting download for URL: {url}")
     out_dir = Path(output_dir) if output_dir else VIDEOS
     out_dir.mkdir(parents=True, exist_ok=True)
 
     norm = normalize_yt_url(url)
+    logger.debug(f"Normalized URL: {norm}")
+    
     # Try pytube
     try:
         p = _download_with_pytube(norm, out_dir, progress)
         if p is not None and p.exists():
+            logger.info(f"Download complete (pytube): {p}")
             return p
-    except Exception:
-        pass
+    except Exception as e:
+        logger.debug(f"Pytube attempt failed, falling back to yt-dlp: {e}")
 
     # Fallback to yt-dlp
     try:
-        return _download_with_ytdlp(norm, out_dir, progress)
+        result = _download_with_ytdlp(norm, out_dir, progress)
+        logger.info(f"Download complete (yt-dlp): {result}")
+        return result
     except Exception as e:
-        raise RuntimeError(f"Failed to download video. Last error: {e}")
+        error_msg = f"Failed to download video. Last error: {e}"
+        logger.error(error_msg)
+        error_tracker.log_error(e, context="Download failed with both pytube and yt-dlp", module="download", function="download_youtube")
+        raise RuntimeError(error_msg)

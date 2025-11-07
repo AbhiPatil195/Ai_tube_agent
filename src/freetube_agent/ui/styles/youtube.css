@@ -1,0 +1,450 @@
+/* YouTube-Inspired Custom Styles for FreeTube-Agent */
+
+/* Root Variables - YouTube Color Scheme */
+:root {
+    --yt-red: #FF0000;
+    --yt-dark-bg: #0f0f0f;
+    --yt-darker-bg: #0a0a0a;
+    --yt-light-bg: #ffffff;
+    --yt-card-bg: #1f1f1f;
+    --yt-hover-bg: #272727;
+    --yt-text-primary: #f1f1f1;
+    --yt-text-secondary: #aaaaaa;
+    --yt-border: #303030;
+    --yt-blue: #3ea6ff;
+}
+
+/* Global Styles */
+.stApp {
+    background-color: var(--yt-dark-bg);
+}
+
+/* Hide Streamlit Branding */
+#MainMenu {visibility: hidden;}
+footer {visibility: hidden;}
+header {visibility: hidden;}
+
+/* Top Navigation Bar - YouTube Style */
+.top-nav {
+    background-color: var(--yt-darker-bg);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--yt-border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--yt-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.logo-icon {
+    color: var(--yt-red);
+    font-size: 32px;
+}
+
+/* Search Bar - YouTube Style */
+.search-container {
+    flex: 1;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.stTextInput > div > div > input {
+    background-color: var(--yt-darker-bg) !important;
+    border: 1px solid var(--yt-border) !important;
+    border-radius: 40px !important;
+    color: var(--yt-text-primary) !important;
+    padding: 10px 20px !important;
+    font-size: 16px !important;
+}
+
+.stTextInput > div > div > input:focus {
+    border-color: var(--yt-blue) !important;
+    box-shadow: 0 0 0 1px var(--yt-blue) !important;
+}
+
+/* Video Cards - YouTube Grid Style */
+.video-card {
+    background-color: var(--yt-card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 24px;
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.video-thumbnail {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-color: var(--yt-darker-bg);
+    position: relative;
+    overflow: hidden;
+}
+
+.video-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.duration-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.video-info {
+    padding: 12px;
+}
+
+.video-title {
+    color: var(--yt-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.video-channel {
+    color: var(--yt-text-secondary);
+    font-size: 12px;
+    margin-bottom: 4px;
+}
+
+/* Buttons - YouTube Style */
+.stButton > button {
+    background-color: var(--yt-red) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 24px !important;
+    padding: 10px 24px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s !important;
+}
+
+.stButton > button:hover {
+    background-color: #cc0000 !important;
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3) !important;
+}
+
+/* Secondary Buttons */
+.secondary-button > button {
+    background-color: var(--yt-card-bg) !important;
+    color: var(--yt-blue) !important;
+    border: 1px solid var(--yt-border) !important;
+}
+
+.secondary-button > button:hover {
+    background-color: var(--yt-hover-bg) !important;
+}
+
+/* Sidebar */
+.css-1d391kg {
+    background-color: var(--yt-darker-bg) !important;
+    border-right: 1px solid var(--yt-border) !important;
+}
+
+/* Text Elements */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--yt-text-primary) !important;
+}
+
+p, span, div {
+    color: var(--yt-text-secondary);
+}
+
+/* Transcript Container */
+.transcript-container {
+    background-color: var(--yt-card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.transcript-segment {
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: var(--yt-darker-bg);
+    border-radius: 8px;
+    border-left: 3px solid var(--yt-red);
+    transition: background-color 0.2s;
+}
+
+.transcript-segment:hover {
+    background-color: var(--yt-hover-bg);
+}
+
+.timestamp {
+    color: var(--yt-blue);
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.segment-text {
+    color: var(--yt-text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Progress Bar */
+.stProgress > div > div > div {
+    background-color: var(--yt-red) !important;
+}
+
+/* Select Box */
+.stSelectbox > div > div {
+    background-color: var(--yt-card-bg) !important;
+    border: 1px solid var(--yt-border) !important;
+    border-radius: 8px !important;
+    color: var(--yt-text-primary) !important;
+}
+
+/* Text Area */
+.stTextArea > div > div > textarea {
+    background-color: var(--yt-card-bg) !important;
+    border: 1px solid var(--yt-border) !important;
+    border-radius: 8px !important;
+    color: var(--yt-text-primary) !important;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--yt-border) !important;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background-color: transparent !important;
+    border-radius: 8px 8px 0 0 !important;
+    color: var(--yt-text-secondary) !important;
+    font-weight: 500 !important;
+    padding: 12px 24px !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: transparent !important;
+    color: var(--yt-text-primary) !important;
+    border-bottom: 3px solid var(--yt-red) !important;
+}
+
+/* Chat/Q&A Container */
+.chat-container {
+    background-color: var(--yt-card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 16px;
+}
+
+.chat-message {
+    padding: 12px 16px;
+    margin-bottom: 12px;
+    border-radius: 12px;
+    max-width: 80%;
+}
+
+.chat-message.user {
+    background-color: var(--yt-blue);
+    color: white;
+    margin-left: auto;
+}
+
+.chat-message.assistant {
+    background-color: var(--yt-hover-bg);
+    color: var(--yt-text-primary);
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.success {
+    background-color: #065f46;
+    color: #10b981;
+}
+
+.status-badge.processing {
+    background-color: #1e3a8a;
+    color: #3ea6ff;
+}
+
+.status-badge.error {
+    background-color: #7f1d1d;
+    color: #ef4444;
+}
+
+/* Info/Warning/Error Messages */
+.stAlert {
+    background-color: var(--yt-card-bg) !important;
+    border: 1px solid var(--yt-border) !important;
+    border-radius: 8px !important;
+    color: var(--yt-text-primary) !important;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--yt-darker-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--yt-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #505050;
+}
+
+/* Grid Layout for Video Cards */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    padding: 24px;
+}
+
+/* Metric Cards */
+.metric-card {
+    background-color: var(--yt-card-bg);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--yt-border);
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--yt-text-primary);
+}
+
+.metric-label {
+    font-size: 14px;
+    color: var(--yt-text-secondary);
+    margin-top: 4px;
+}
+
+/* Loading Animation */
+.loading-spinner {
+    border: 3px solid var(--yt-border);
+    border-top: 3px solid var(--yt-red);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Container Styling */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+/* Card Hover Effects */
+.hover-card {
+    transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Video Player Styling */
+video {
+    border-radius: 12px;
+    width: 100%;
+    background-color: var(--yt-darker-bg);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* Audio Player Styling */
+audio {
+    width: 100%;
+    border-radius: 8px;
+}
+
+/* Video/Audio Container */
+.stVideo, .stAudio {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Player Controls */
+video::-webkit-media-controls-panel {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+video::-webkit-media-controls-play-button,
+video::-webkit-media-controls-pause-button {
+    background-color: var(--yt-red);
+    border-radius: 50%;
+}
+
+/* Now Playing Badge */
+.now-playing {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: linear-gradient(90deg, var(--yt-red) 0%, #cc0000 100%);
+    color: white;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
